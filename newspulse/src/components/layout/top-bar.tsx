@@ -44,16 +44,16 @@ export async function TopBar() {
   return (
     <div className="border-b border-white/10 bg-neutral-950 text-neutral-200">
       <Container className="flex h-10 items-center gap-4">
-        <span className="inline-flex shrink-0 items-center gap-2 rounded border border-brand/70 bg-brand/15 px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-white">
-          <span className="relative flex size-2" aria-hidden="true">
-            <span className="absolute inline-flex size-full animate-ping rounded-full bg-brand opacity-70 motion-reduce:animate-none" />
-            <span className="relative inline-flex size-2 rounded-full bg-brand" />
+        <span className="inline-flex shrink-0 items-center gap-2 rounded border-[0.02mm]! border-rose-300/70 bg-rose-300/15 px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-rose-400">
+          <span className="relative flex size-2 scale-80" aria-hidden="true">
+            <span className="absolute inline-flex size-full animate-ping rounded-full bg-rose-400 opacity-70 motion-reduce:animate-none" />
+            <span className="relative inline-flex size-2 rounded-full bg-rose-400" />
           </span>
-          <Zap className="size-3.5 text-brand" aria-hidden="true" />
+          <Zap className="size-3.5" aria-hidden="true" />
           Flash
         </span>
 
-        <span className="hidden h-4 w-px bg-white/15 sm:block" aria-hidden="true" />
+        <span className="hidden h-4 w-px bg-white/20 sm:block" aria-hidden="true" />
 
         <FlashTicker items={items} />
 
@@ -69,7 +69,7 @@ export async function TopBar() {
                   {index > 0 && <span aria-hidden="true">·</span>}
                   <span>
                     {city.name}{" "}
-                    <span className="tabular-nums text-neutral-200">
+                    <span className="tabular-nums text-neutral-100">
                       {city.temperature}°C
                     </span>
                   </span>

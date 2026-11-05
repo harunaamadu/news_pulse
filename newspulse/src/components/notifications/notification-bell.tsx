@@ -1,10 +1,10 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Bell, CheckCheck, MessageSquare, Newspaper } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
+import { Bell, CheckCheck, Mail, MessageSquare, Newspaper } from "lucide-react";
 
 import {
   markAllNotificationsReadAction,
@@ -222,7 +222,11 @@ export function NotificationBell() {
             <ul className="divide-y">
               {items.map((item) => {
                 const Icon =
-                  item.type === "COMMENT_REPLY" ? MessageSquare : Newspaper;
+                  item.type === "COMMENT_REPLY"
+                    ? MessageSquare
+                    : item.type === "CONTACT_MESSAGE"
+                      ? Mail
+                      : Newspaper;
 
                 return (
                   <li key={item.id}>

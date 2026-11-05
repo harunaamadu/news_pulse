@@ -14,7 +14,8 @@
     "db:studio": "prisma studio",
     "notify:demo": "tsx --env-file=.env prisma/notify-demo.ts",
     "user:role": "tsx --env-file=.env prisma/set-role.ts",
-    "user:password": "tsx --env-file=.env prisma/set-password.ts"
+    "user:password": "tsx --env-file=.env prisma/set-password.ts",
+    "notify:backfill": "tsx --env-file=.env prisma/backfill-message-notifications.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.3",

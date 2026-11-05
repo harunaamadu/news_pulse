@@ -62,7 +62,7 @@ export type SearchResult = {
 
 export type NotificationItem = {
   id: string;
-  type: "NEW_ARTICLE" | "COMMENT_REPLY";
+  type: "NEW_ARTICLE" | "COMMENT_REPLY" | "CONTACT_MESSAGE";
   title: string;
   body: string | null;
   href: string;

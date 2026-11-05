@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { topicLabel } from "@/lib/contact";
 
 function truncate(text: string, max: number): string {
   const clean = text.replace(/\s+/g, " ").trim();
@@ -65,4 +66,37 @@ export async function notifyFollowersOfArticle(
   });
 
   return count;
+}
+
+interface ContactNotificationInput {
+  id: string;
+  name: string;
+  topic: string;
+  message: string;
+}
+
+export async function notifyAdminsOfContactMessage(
+  input: ContactNotificationInput,
+): Promise<void> {
+  try {
+    const admins = await prisma.user.findMany({
+      where: { role: "ADMIN" },
+      select: { id: true },
+    });
+    if (admins.length === 0) return;
+
+    await prisma.notification.createMany({
+      data: admins.map(({ id }) => ({
+        userId: id,
+        type: "CONTACT_MESSAGE" as const,
+        title: `New message from ${input.name}`,
+        body: `${topicLabel(input.topic)}: ${truncate(input.message, 100)}`,
+        href: "/admin/messages",
+        dedupeKey: `contact:${input.id}`,
+      })),
+      skipDuplicates: true,
+    });
+  } catch (error) {
+    console.error("Failed to notify admins of contact message", error);
+  }
 }

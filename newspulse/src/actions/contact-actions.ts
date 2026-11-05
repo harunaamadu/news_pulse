@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { notifyAdminsOfContactMessage } from "@/lib/notifications";
 
 import { prisma } from "@/lib/prisma";
 import {
@@ -41,14 +42,26 @@ export async function submitContactAction(
     return { error: rateLimitMessage(limit.retryAfter), values: raw };
   }
 
+  let created: { id: string };
+
   try {
-    await prisma.contactMessage.create({ data: parsed.data });
+    created = await prisma.contactMessage.create({
+      data: parsed.data,
+      select: { id: true },
+    });
   } catch {
     return {
       error: "Couldn't send your message. Please try again in a moment.",
       values: raw,
     };
   }
+
+  await notifyAdminsOfContactMessage({
+    id: created.id,
+    name: parsed.data.name,
+    topic: parsed.data.topic,
+    message: parsed.data.message,
+  });
 
   revalidatePath("/admin/messages");
   return { success: true };

@@ -46,7 +46,7 @@ export function FlashTicker({ items }: { items: FlashItem[] }) {
   }, [running, position]);
 
   function go(delta: number) {
-    setIndex((value) => (((value % count) + delta + count) % count));
+    setIndex((value) => ((value % count) + delta + count) % count);
   }
 
   function handleBlur(event: FocusEvent<HTMLDivElement>) {
@@ -101,9 +101,12 @@ export function FlashTicker({ items }: { items: FlashItem[] }) {
               {current.title}
             </Link>
             {now !== null && (
-              <span className="hidden shrink-0 font-mono text-xs text-neutral-500 sm:inline">
+              <time
+                dateTime={current.publishedAt}
+                className="hidden shrink-0 font-mono text-xs text-neutral-500 sm:inline"
+              >
                 ({formatShortAgo(current.publishedAt, now)})
-              </span>
+              </time>
             )}
           </motion.div>
         </AnimatePresence>
@@ -142,7 +145,11 @@ export function FlashTicker({ items }: { items: FlashItem[] }) {
                   : "Pause auto-rotation"
             }
           >
-            {paused ? <Play className="size-3.5" /> : <Pause className="size-3.5" />}
+            {paused ? (
+              <Play className="size-3.5" />
+            ) : (
+              <Pause className="size-3.5" />
+            )}
           </Button>
           <Button
             type="button"

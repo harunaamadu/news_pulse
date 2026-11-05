@@ -184,6 +184,7 @@ model CategoryFollow {
 enum NotificationType {
   NEW_ARTICLE
   COMMENT_REPLY
+  CONTACT_MESSAGE
 }
 
 model Notification {

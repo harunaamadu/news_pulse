@@ -1,6 +1,15 @@
 -- CreateEnum
 CREATE TYPE "Role" AS ENUM ('USER', 'EDITOR', 'ADMIN');
 
+-- CreateEnum
+CREATE TYPE "ArticleStatus" AS ENUM ('DRAFT', 'PUBLISHED');
+
+-- CreateEnum
+CREATE TYPE "NotificationType" AS ENUM ('NEW_ARTICLE', 'COMMENT_REPLY');
+
+-- CreateEnum
+CREATE TYPE "ContactTopic" AS ENUM ('GENERAL', 'CORRECTION', 'TIP', 'PRESS', 'SUPPORT');
+
 -- CreateTable
 CREATE TABLE "users" (
     "id" TEXT NOT NULL,
@@ -76,6 +85,7 @@ CREATE TABLE "articles" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "authorId" TEXT NOT NULL,
     "categoryId" TEXT NOT NULL,
+    "status" "ArticleStatus" NOT NULL DEFAULT 'PUBLISHED',
 
     CONSTRAINT "articles_pkey" PRIMARY KEY ("id")
 );
@@ -109,6 +119,34 @@ CREATE TABLE "category_follows" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "category_follows_pkey" PRIMARY KEY ("userId","categoryId")
+);
+
+-- CreateTable
+CREATE TABLE "notifications" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "type" "NotificationType" NOT NULL,
+    "title" TEXT NOT NULL,
+    "body" TEXT,
+    "href" TEXT NOT NULL,
+    "dedupeKey" TEXT,
+    "readAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "notifications_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "contact_messages" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "topic" "ContactTopic" NOT NULL DEFAULT 'GENERAL',
+    "message" TEXT NOT NULL,
+    "handledAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "contact_messages_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -145,6 +183,9 @@ CREATE INDEX "articles_categoryId_publishedAt_idx" ON "articles"("categoryId", "
 CREATE INDEX "articles_featured_publishedAt_idx" ON "articles"("featured", "publishedAt");
 
 -- CreateIndex
+CREATE INDEX "articles_status_publishedAt_idx" ON "articles"("status", "publishedAt");
+
+-- CreateIndex
 CREATE INDEX "articles_publishedAt_idx" ON "articles"("publishedAt");
 
 -- CreateIndex
@@ -155,6 +196,18 @@ CREATE INDEX "comments_parentId_idx" ON "comments"("parentId");
 
 -- CreateIndex
 CREATE INDEX "bookmarks_articleId_idx" ON "bookmarks"("articleId");
+
+-- CreateIndex
+CREATE INDEX "notifications_userId_readAt_idx" ON "notifications"("userId", "readAt");
+
+-- CreateIndex
+CREATE INDEX "notifications_userId_createdAt_idx" ON "notifications"("userId", "createdAt");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "notifications_userId_dedupeKey_key" ON "notifications"("userId", "dedupeKey");
+
+-- CreateIndex
+CREATE INDEX "contact_messages_handledAt_createdAt_idx" ON "contact_messages"("handledAt", "createdAt");
 
 -- AddForeignKey
 ALTER TABLE "accounts" ADD CONSTRAINT "accounts_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -188,3 +241,6 @@ ALTER TABLE "category_follows" ADD CONSTRAINT "category_follows_userId_fkey" FOR
 
 -- AddForeignKey
 ALTER TABLE "category_follows" ADD CONSTRAINT "category_follows_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "categories"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "notifications" ADD CONSTRAINT "notifications_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
