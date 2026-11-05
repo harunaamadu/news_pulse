@@ -1,7 +1,7 @@
-import { PrismaClient } from "../src/generated/prisma/client";
+// import { PrismaClient } from "../src/generated/prisma/client";
 import { notifyFollowersOfArticle } from "../src/lib/notifications";
 
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma";
 
 async function main() {
   const articles = await prisma.article.findMany({

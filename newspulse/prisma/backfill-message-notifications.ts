@@ -1,7 +1,8 @@
-import { PrismaClient } from "../src/generated/prisma/client";
+import { prisma } from "@/lib/prisma";
 import { notifyAdminsOfContactMessage } from "../src/lib/notifications";
+// import { PrismaClient } from "../src/generated/prisma/client";
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
 
 async function main() {
   const open = await prisma.contactMessage.findMany({

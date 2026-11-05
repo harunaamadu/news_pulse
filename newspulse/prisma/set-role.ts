@@ -1,6 +1,6 @@
-import { PrismaClient, type Role } from "../src/generated/prisma/client";
+import { type Role } from "../src/generated/prisma/client";
+import { prisma } from "@/lib/prisma";
 
-const prisma = new PrismaClient();
 const roles: Role[] = ["USER", "EDITOR", "ADMIN"];
 
 async function main() {

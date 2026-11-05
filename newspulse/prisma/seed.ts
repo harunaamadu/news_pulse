@@ -1,7 +1,8 @@
-import { PrismaClient } from "../src/generated/prisma/client";
+import { prisma } from "@/lib/prisma";
+// import { PrismaClient } from "../src/generated/prisma/client";
 import bcrypt from "bcryptjs";
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
 
 const categories = [
   { slug: "world", name: "World" },
