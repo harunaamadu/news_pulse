@@ -122,3 +122,28 @@ export async function deleteUserAction(
   revalidateAdmin();
   return { ok: true, message: `${target.name ?? target.email} was deleted.` };
 }
+
+export async function setMessageHandledAction(
+  messageId: string,
+  handled: boolean,
+): Promise<AdminActionResult> {
+  const admin = await getAdminUser();
+  if (!admin) return { ok: false, error: NO_ACCESS };
+
+  const id = idSchema.safeParse(messageId);
+  if (!id.success || typeof handled !== "boolean") {
+    return { ok: false, error: "Invalid request." };
+  }
+
+  try {
+    await prisma.contactMessage.update({
+      where: { id: id.data },
+      data: { handledAt: handled ? new Date() : null },
+    });
+  } catch {
+    return { ok: false, error: "Couldn't update that message." };
+  }
+
+  revalidatePath("/admin/messages");
+  return { ok: true, message: handled ? "Marked as handled." : "Reopened." };
+}

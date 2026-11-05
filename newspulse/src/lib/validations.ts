@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { imageHosts } from "@/config/site";
 
+import { CONTACT_TOPIC_VALUES } from "@/lib/contact";
+
 const email = z
   .string()
   .trim()
@@ -76,3 +78,18 @@ export const articleSchema = z.object({
 });
 
 export type ArticleInput = z.infer<typeof articleSchema>;
+
+export const contactSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(2, "Name must be at least 2 characters.")
+    .max(80, "Name must be 80 characters or fewer."),
+  email,
+  topic: z.enum(CONTACT_TOPIC_VALUES, { message: "Choose a topic." }),
+  message: z
+    .string()
+    .trim()
+    .min(20, "Please write at least 20 characters.")
+    .max(2000, "Keep your message under 2,000 characters."),
+});

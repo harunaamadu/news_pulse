@@ -205,3 +205,24 @@ model Notification {
   @@index([userId, createdAt])
   @@map("notifications")
 }
+
+enum ContactTopic {
+  GENERAL
+  CORRECTION
+  TIP
+  PRESS
+  SUPPORT
+}
+
+model ContactMessage {
+  id        String       @id @default(cuid())
+  name      String
+  email     String
+  topic     ContactTopic @default(GENERAL)
+  message   String       @db.Text
+  handledAt DateTime?
+  createdAt DateTime     @default(now())
+
+  @@index([handledAt, createdAt])
+  @@map("contact_messages")
+}

@@ -107,3 +107,18 @@ export async function countPublishedArticles(categorySlug?: string) {
     },
   });
 }
+
+export async function getFlashArticles(take = 6) {
+  return prisma.article.findMany({
+    where: published,
+    orderBy: [{ publishedAt: "desc" }, { id: "desc" }],
+    take,
+    select: {
+      id: true,
+      slug: true,
+      title: true,
+      publishedAt: true,
+      category: { select: { name: true, slug: true } },
+    },
+  });
+}

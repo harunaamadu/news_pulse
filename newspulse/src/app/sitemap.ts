@@ -3,6 +3,9 @@ import type { MetadataRoute } from "next";
 import { siteConfig } from "@/config/site";
 import { prisma } from "@/lib/prisma";
 
+import { listFeatures } from "@/content/features";
+import { listStandards } from "@/content/standards";
+
 // Rebuilt at most once an hour
 export const revalidate = 3600;
 
@@ -23,6 +26,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: base, changeFrequency: "hourly", priority: 1 },
     { url: `${base}/topics`, changeFrequency: "weekly", priority: 0.5 },
     { url: `${base}/discussions`, changeFrequency: "daily", priority: 0.5 },
+    { url: `${base}/about`, changeFrequency: "yearly", priority: 0.4 },
+    { url: `${base}/contact`, changeFrequency: "yearly", priority: 0.4 },
+    { url: `${base}/standards`, changeFrequency: "yearly", priority: 0.3 },
+    ...listStandards().map((standard) => ({
+      url: `${base}/standards/${standard.slug}`,
+      lastModified: new Date(standard.updated),
+      changeFrequency: "yearly" as const,
+      priority: 0.3,
+    })),
+    ...listFeatures()
+      .filter((feature) => !feature.soon)
+      .map((feature) => ({
+        url: `${base}/feature/${feature.slug}`,
+        changeFrequency: "weekly" as const,
+        priority: 0.6,
+      })),
     ...categories.map((category) => ({
       url: `${base}/category/${category.slug}`,
       changeFrequency: "daily" as const,

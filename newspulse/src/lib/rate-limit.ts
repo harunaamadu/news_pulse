@@ -10,6 +10,7 @@ const policies = {
   comment: { requests: 10, window: "1 m" },
   search: { requests: 30, window: "1 m" },
   browse: { requests: 60, window: "1 m" },
+  contact: { requests: 3, window: "10 m" },
 } satisfies Record<string, { requests: number; window: Window }>;
 
 export type RateLimitName = keyof typeof policies;

@@ -87,6 +87,28 @@ export function SiteFooter({ currentYear }: SiteFooterProps) {
             </ul>
           </nav>
 
+          <nav aria-label="Company" className="space-y-3">
+            <h2 className="font-sans text-sm font-semibold">Company</h2>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li>
+                <Link
+                  href="/about"
+                  className="transition-colors hover:text-foreground"
+                >
+                  About us
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/contact"
+                  className="transition-colors hover:text-foreground"
+                >
+                  Contact
+                </Link>
+              </li>
+            </ul>
+          </nav>
+
           <nav
             aria-label="Standards & Integrity"
             className="space-y-3 basis-xs max-md:flex-1 col-span-2"

@@ -2,6 +2,7 @@ import { Suspense, type ReactNode } from "react";
 
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
+import { TopBar, TopBarSkeleton } from "@/components/layout/top-bar";
 
 export default function MainLayout({ children }: { children: ReactNode }) {
   return (
@@ -12,6 +13,9 @@ export default function MainLayout({ children }: { children: ReactNode }) {
       >
         Skip to content
       </a>
+      <Suspense fallback={<TopBarSkeleton />}>
+        <TopBar />
+      </Suspense>
       <Suspense fallback={<div className="h-28 border-b" aria-hidden="true" />}>
         <SiteHeader />
       </Suspense>
