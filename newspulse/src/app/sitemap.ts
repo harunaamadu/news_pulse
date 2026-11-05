@@ -7,7 +7,8 @@ import { listFeatures } from "@/content/features";
 import { listStandards } from "@/content/standards";
 
 // Rebuilt at most once an hour
-export const revalidate = 3600;
+// export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = siteConfig.url;
