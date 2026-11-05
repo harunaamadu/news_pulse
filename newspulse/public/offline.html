@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Offline | NewsPulse</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #ffffff;
+        --fg: #171717;
+        --muted: #6b7280;
+        --border: #e5e7eb;
+        --card: #fafafa;
+        --brand: #d7372b;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0a0a0a;
+          --fg: #fafafa;
+          --muted: #a3a3a3;
+          --border: #262626;
+          --card: #141414;
+          --brand: #f0624f;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--fg);
+        font-family:
+          system-ui,
+          -apple-system,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
+        line-height: 1.6;
+      }
+      .wrap {
+        max-width: 44rem;
+        margin: 0 auto;
+        padding: 1.5rem 1rem 4rem;
+      }
+      .top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding-bottom: 1rem;
+        margin-bottom: 2rem;
+        border-bottom: 1px solid var(--border);
+      }
+      .logo {
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 1.4rem;
+        font-weight: 700;
+      }
+      .logo span {
+        color: var(--brand);
+      }
+      .status {
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 0.2rem 0.65rem;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        color: var(--muted);
+      }
+      h1,
+      h2 {
+        font-family: Georgia, "Times New Roman", serif;
+        line-height: 1.2;
+        margin: 0;
+      }
+      h1 {
+        font-size: 2rem;
+      }
+      .lead {
+        color: var(--muted);
+        margin: 0.75rem 0 2rem;
+      }
+      .eyebrow {
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--brand);
+      }
+      ul.list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 0.75rem;
+      }
+      .item {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+        justify-content: space-between;
+        padding: 1rem 1.25rem;
+        border: 1px solid var(--border);
+        border-radius: 0.875rem;
+        background: var(--card);
+      }
+      .item a {
+        color: inherit;
+        text-decoration: none;
+      }
+      .item a:hover h2 {
+        text-decoration: underline;
+      }
+      .item h2 {
+        font-size: 1.15rem;
+      }
+      .meta {
+        font-size: 0.8rem;
+        color: var(--muted);
+        margin-top: 0.25rem;
+      }
+      button,
+      .btn {
+        font: inherit;
+        font-size: 0.85rem;
+        cursor: pointer;
+        text-decoration: none;
+        padding: 0.4rem 0.85rem;
+        border-radius: 0.5rem;
+        color: var(--fg);
+        border: 1px solid var(--border);
+        background: transparent;
+        display: inline-block;
+      }
+      button:hover,
+      .btn:hover {
+        background: var(--card);
+      }
+      a:focus-visible,
+      button:focus-visible {
+        outline: 2px solid var(--brand);
+        outline-offset: 2px;
+      }
+      .empty {
+        text-align: center;
+        padding: 3rem 1.5rem;
+        border: 1px dashed var(--border);
+        border-radius: 1rem;
+        color: var(--muted);
+      }
+      .actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-top: 1.5rem;
+      }
+      article img {
+        width: 100%;
+        height: auto;
+        border-radius: 1rem;
+        margin: 1.5rem 0;
+        background: var(--card);
+      }
+      .body {
+        font-size: 1.1rem;
+      }
+      .body h2,
+      .body h3 {
+        font-family: Georgia, serif;
+        margin: 2rem 0 0.75rem;
+      }
+      .body a {
+        color: var(--brand);
+      }
+      .body blockquote {
+        margin: 1.5rem 0;
+        padding-left: 1rem;
+        border-left: 3px solid var(--brand);
+        color: var(--muted);
+      }
+      .body img {
+        max-width: 100%;
+      }
+      .back {
+        display: inline-block;
+        margin-bottom: 1.5rem;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="top">
+        <span class="logo">News<span>Pulse</span></span>
+        <span id="status" class="status" role="status"></span>
+      </header>
+      <main id="app" aria-live="polite"></main>
+    </div>
+
+    <script>
+      (function () {
+        "use strict";
+
+        // Keep in sync with src/lib/offline/offline-store.ts
+        var DB_NAME = "newspulse-offline";
+        var STORE = "articles";
+        var IMAGE_CACHE = "np-offline-images";
+
+        var app = document.getElementById("app");
+        var statusEl = document.getElementById("status");
+
+        function el(tag, className, text) {
+          var node = document.createElement(tag);
+          if (className) node.className = className;
+          if (text !== undefined) node.textContent = text; // textContent only: never innerHTML for stored fields
+          return node;
+        }
+
+        function openDb() {
+          return new Promise(function (resolve, reject) {
+            var request = indexedDB.open(DB_NAME, 1);
+            request.onupgradeneeded = function () {
+              var db = request.result;
+              if (!db.objectStoreNames.contains(STORE)) {
+                db.createObjectStore(STORE, { keyPath: "slug" });
+              }
+            };
+            request.onsuccess = function () {
+              resolve(request.result);
+            };
+            request.onerror = function () {
+              reject(request.error);
+            };
+          });
+        }
+
+        function run(mode, fn) {
+          return openDb().then(function (db) {
+            return new Promise(function (resolve, reject) {
+              var tx = db.transaction(STORE, mode);
+              var request = fn(tx.objectStore(STORE));
+              tx.oncomplete = function () {
+                db.close();
+                resolve(request.result);
+              };
+              tx.onerror = tx.onabort = function () {
+                db.close();
+                reject(tx.error);
+              };
+            });
+          });
+        }
+
+        function imageUrl(src) {
+          return "/_next/image?url=" + encodeURIComponent(src) + "&w=1200&q=75";
+        }
+
+        function formatDate(iso) {
+          return new Date(iso).toLocaleDateString(undefined, {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          });
+        }
+
+        function updateStatus() {
+          statusEl.textContent = navigator.onLine ? "Back online" : "Offline";
+        }
+
+        function clear() {
+          app.textContent = "";
+        }
+
+        function renderLibrary(articles) {
+          clear();
+          app.appendChild(el("p", "eyebrow", "Offline library"));
+          app.appendChild(el("h1", "", "Saved stories"));
+          app.appendChild(
+            el(
+              "p",
+              "lead",
+              "These stories are stored on this device and readable without a connection.",
+            ),
+          );
+
+          if (articles.length === 0) {
+            var empty = el("div", "empty");
+            empty.appendChild(
+              el(
+                "p",
+                "",
+                "Nothing saved yet. Open a story and tap “Read offline” while you're connected.",
+              ),
+            );
+            app.appendChild(empty);
+          } else {
+            articles.sort(function (a, b) {
+              return b.savedAt.localeCompare(a.savedAt);
+            });
+            var list = el("ul", "list");
+            articles.forEach(function (article) {
+              var li = el("li", "item");
+              var link = el("a");
+              link.href =
+                "offline.html?slug=" + encodeURIComponent(article.slug);
+              link.appendChild(el("h2", "", article.title));
+              link.appendChild(
+                el(
+                  "p",
+                  "meta",
+                  article.category +
+                    " · " +
+                    article.readTimeMinutes +
+                    " min read",
+                ),
+              );
+
+              var remove = el("button", "", "Remove");
+              remove.type = "button";
+              remove.setAttribute(
+                "aria-label",
+                "Remove " + article.title + " from offline library",
+              );
+              remove.addEventListener("click", function () {
+                removeArticle(article).then(load);
+              });
+
+              li.appendChild(link);
+              li.appendChild(remove);
+              list.appendChild(li);
+            });
+            app.appendChild(list);
+          }
+
+          var actions = el("div", "actions");
+          var home = el("a", "btn", "Go to NewsPulse");
+          home.href = "/";
+          actions.appendChild(home);
+          app.appendChild(actions);
+        }
+
+        function renderArticle(article) {
+          clear();
+          var back = el("a", "back", "← Saved stories");
+          back.href = "offline.html";
+          app.appendChild(back);
+
+          var node = el("article");
+          node.appendChild(el("p", "eyebrow", article.category));
+          node.appendChild(el("h1", "", article.title));
+          node.appendChild(el("p", "lead", article.excerpt));
+          node.appendChild(
+            el(
+              "p",
+              "meta",
+              article.author +
+                " · " +
+                formatDate(article.publishedAt) +
+                " · " +
+                article.readTimeMinutes +
+                " min read",
+            ),
+          );
+
+          var img = el("img");
+          img.alt = "";
+          img.src = imageUrl(article.coverImage);
+          img.addEventListener("error", function () {
+            img.remove();
+          });
+          node.appendChild(img);
+
+          // article.html comes from our own server (react-markdown, which does not pass raw HTML through)
+          var body = el("div", "body");
+          body.innerHTML = article.html;
+          node.appendChild(body);
+
+          app.appendChild(node);
+          document.title = article.title + " | NewsPulse (offline)";
+          window.scrollTo(0, 0);
+        }
+
+        function renderMissing() {
+          clear();
+          var empty = el("div", "empty");
+          empty.appendChild(el("h1", "", "This story isn't saved"));
+          empty.appendChild(
+            el(
+              "p",
+              "lead",
+              "Open it while you're online and tap “Read offline” to keep a copy.",
+            ),
+          );
+          var link = el("a", "btn", "View saved stories");
+          link.href = "offline.html";
+          empty.appendChild(link);
+          app.appendChild(empty);
+        }
+
+        function removeArticle(article) {
+          return run("readwrite", function (store) {
+            return store.delete(article.slug);
+          })
+            .then(function () {
+              if (!("caches" in window)) return;
+              return caches.open(IMAGE_CACHE).then(function (cache) {
+                return cache.delete(imageUrl(article.coverImage), {
+                  ignoreVary: true,
+                });
+              });
+            })
+            .catch(function () {});
+        }
+
+        function load() {
+          var slug = new URLSearchParams(location.search).get("slug");
+
+          if (slug) {
+            return run("readonly", function (store) {
+              return store.get(slug);
+            }).then(function (article) {
+              article ? renderArticle(article) : renderMissing();
+            });
+          }
+
+          return run("readonly", function (store) {
+            return store.getAll();
+          }).then(renderLibrary);
+        }
+
+        window.addEventListener("online", updateStatus);
+        window.addEventListener("offline", updateStatus);
+        updateStatus();
+
+        if (!("indexedDB" in window)) {
+          renderMissing();
+        } else {
+          load().catch(function () {
+            renderLibrary([]);
+          });
+        }
+      })();
+    </script>
+  </body>
+</html>

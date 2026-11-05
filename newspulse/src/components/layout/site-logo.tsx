@@ -15,7 +15,7 @@ export function SiteLogo({ className }: { className?: string }) {
         <span className="relative inline-flex size-2.5 rounded-full bg-primary" />
       </span>
       <span className="font-serif text-xl font-bold tracking-tight">
-        News<span className="text-brand">Pulse</span>
+        News<span className="text-primary">Pulse</span>
       </span>
     </Link>
   );

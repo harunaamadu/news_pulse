@@ -27,6 +27,8 @@ import { getArticleBySlug, getRelatedArticles } from "@/lib/queries/articles";
 import { isArticleBookmarked } from "@/lib/queries/bookmarks";
 import { getInitials } from "@/lib/utils";
 
+import { SaveOfflineButton } from "@/components/articles/save-offline-button";
+
 import { Suspense } from "react";
 
 import {
@@ -168,6 +170,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                     initialBookmarked={bookmarked}
                     isAuthenticated={Boolean(userId)}
                   />
+                  <SaveOfflineButton slug={article.slug} />
                   <ShareButton title={article.title} />
                 </div>
               </div>

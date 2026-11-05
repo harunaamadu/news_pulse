@@ -13,7 +13,7 @@ export function SectionHeading({
   linkLabel = "View all",
 }: SectionHeadingProps) {
   return (
-    <div className="flex items-end justify-between gap-4 border-b-2 border-foreground pb-2">
+    <div className="flex items-end justify-between gap-4 border-b border-foreground pb-2">
       <h2 className="text-2xl font-semibold">{title}</h2>
       {href && (
         <Link

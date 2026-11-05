@@ -166,7 +166,8 @@
       scroll-behavior: auto;
     }
   }
-  button:not(:disabled), [role="button"]:not(:disabled) {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
     cursor: pointer;
   }
 }
@@ -195,4 +196,16 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(120, 113, 108, 0.5);
+}
+
+.pattern-dots {
+  background-image:
+    radial-gradient(var(--primary) 2px, transparent 2px),
+    radial-gradient(var(--primary) 2px, transparent 2px);
+  background-size: 20px 20px;
+  background-position:
+    0 0,
+    10px 10px;
+  background-color: var(--background);
+  opacity: 0.1;
 }

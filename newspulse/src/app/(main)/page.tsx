@@ -1,7 +1,14 @@
+import { Suspense } from "react";
+
+import { auth } from "@/auth";
 import { ArticleGrid } from "@/components/articles/article-grid";
 import { FeaturedArticle } from "@/components/articles/featured-article";
 import { TrendingList } from "@/components/articles/trending-list";
 import { Container } from "@/components/layout/container";
+import {
+  ForYouSection,
+  ForYouSkeleton,
+} from "@/components/personalization/for-you-section";
 import { Reveal } from "@/components/shared/motion-primitives";
 import { SectionHeading } from "@/components/shared/section-heading";
 import {
@@ -10,10 +17,12 @@ import {
 } from "@/lib/queries/articles";
 
 export default async function HomePage() {
-  const [featured, latest] = await Promise.all([
+  const [session, featured, latest] = await Promise.all([
+    auth(),
     getFeaturedArticle(),
     getLatestArticles(13),
   ]);
+  const userId = session?.user?.id;
 
   const hero = featured ?? latest[0];
 
@@ -42,6 +51,12 @@ export default async function HomePage() {
           <TrendingList title="In the news" articles={inTheNews} />
         </section>
       </Reveal>
+
+      {userId && (
+        <Suspense fallback={<ForYouSkeleton />}>
+          <ForYouSection userId={userId} excludeId={hero.id} />
+        </Suspense>
+      )}
 
       {moreStories.length > 0 && (
         <section aria-labelledby="latest-heading" className="space-y-6">

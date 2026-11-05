@@ -67,7 +67,7 @@ export function BookmarksList({ articles }: { articles: ArticleWithRelations[] }
               size="icon"
               onClick={() => handleRemove(article)}
               aria-label={`Remove "${article.title}" from bookmarks`}
-              className="absolute right-3 top-3 z-20 size-8 rounded-full bg-background/90 shadow backdrop-blur"
+              className="absolute right-3 top-3 z-20 size-8 rounded-full bg-background/90 shadow supports-backdrop-filter:backdrop-blur backdrop-blur"
             >
               <X className="size-4" aria-hidden="true" />
             </Button>

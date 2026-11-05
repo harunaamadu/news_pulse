@@ -8,11 +8,31 @@ import { siteConfig } from "@/config/site";
 import { isActivePath } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
 
+const navClassName = "hidden items-center gap-1 md:flex";
+const linkClassName =
+  "relative rounded-md px-3 py-2 text-sm font-medium transition-colors hover:text-foreground";
+
+export function MainNavFallback() {
+  return (
+    <nav aria-label="Main" className={navClassName}>
+      {siteConfig.nav.map((item) => (
+        <Link
+          key={item.href}
+          href={item.href}
+          className={cn(linkClassName, "text-muted-foreground")}
+        >
+          {item.label}
+        </Link>
+      ))}
+    </nav>
+  );
+}
+
 export function MainNav() {
   const pathname = usePathname();
 
   return (
-    <nav aria-label="Main" className="hidden items-center gap-1 md:flex">
+    <nav aria-label="Main" className={navClassName}>
       {siteConfig.nav.map((item) => {
         const active = isActivePath(pathname, item.href);
 
@@ -22,8 +42,8 @@ export function MainNav() {
             href={item.href}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "relative rounded-md px-3 py-2 text-sm font-medium transition-colors hover:text-foreground",
-              active ? "text-foreground" : "text-muted-foreground",
+              linkClassName,
+              active ? "text-primary" : "text-muted-foreground",
             )}
           >
             {item.label}

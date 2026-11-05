@@ -16,6 +16,7 @@ export type ActionState = {
   fieldErrors?: Partial<Record<string, string[]>>;
   values?: Record<string, string>;
   success?: boolean;
+  message?: string;
 };
 
 const authorSelect = {
@@ -47,3 +48,37 @@ export type CommentWithReplies = Prisma.CommentGetPayload<
 export type ToggleBookmarkResult =
   | { ok: true; bookmarked: boolean }
   | { ok: false; reason: "unauthenticated" | "failed" };
+
+export type ToggleFollowResult =
+  | { ok: true; following: boolean }
+  | { ok: false; reason: "unauthenticated" | "failed" };
+
+export type SearchResult = {
+  id: string;
+  slug: string;
+  title: string;
+  category: string;
+};
+
+export type NotificationItem = {
+  id: string;
+  type: "NEW_ARTICLE" | "COMMENT_REPLY";
+  title: string;
+  body: string | null;
+  href: string;
+  createdAt: string; // ISO string, safe to send over JSON
+  read: boolean;
+};
+
+export type OfflineArticle = {
+  slug: string;
+  title: string;
+  excerpt: string;
+  html: string; // server-rendered from Markdown (raw HTML is not passed through)
+  category: string;
+  author: string;
+  publishedAt: string;
+  readTimeMinutes: number;
+  coverImage: string;
+  savedAt: string;
+};

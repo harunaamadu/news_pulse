@@ -3,14 +3,10 @@ import Link from "next/link";
 
 import { auth } from "@/auth";
 import { CommentForm } from "@/components/comments/comment-form";
-import { CommentItem } from "@/components/comments/comment-item";
-import {
-  StaggerGroup,
-  StaggerItem,
-} from "@/components/shared/motion-primitives";
+import { CommentList } from "@/components/comments/comment-list";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getCommentsForArticle } from "@/lib/queries/comments";
+import { getCommentCount, getCommentsPage } from "@/lib/queries/comments";
 
 interface CommentSectionProps {
   articleId: string;
@@ -18,17 +14,14 @@ interface CommentSectionProps {
 }
 
 export async function CommentSection({ articleId, slug }: CommentSectionProps) {
-  const [session, comments] = await Promise.all([
+  const [session, page, total] = await Promise.all([
     auth(),
-    getCommentsForArticle(articleId),
+    getCommentsPage(articleId),
+    getCommentCount(articleId),
   ]);
 
   const user = session?.user;
   const currentUser = user?.id ? { id: user.id, role: user.role } : null;
-  const total = comments.reduce(
-    (count, comment) => count + 1 + comment.replies.length,
-    0,
-  );
   const signInHref = `/sign-in?callbackUrl=${encodeURIComponent(`/article/${slug}`)}`;
 
   return (
@@ -59,24 +52,20 @@ export async function CommentSection({ articleId, slug }: CommentSectionProps) {
         </div>
       )}
 
-      {comments.length === 0 ? (
+      {page.items.length === 0 ? (
         <p className="flex items-center justify-center gap-2 py-6 text-sm text-muted-foreground">
           <MessageSquare className="size-4" aria-hidden="true" />
           No comments yet. Start the conversation.
         </p>
       ) : (
-        <StaggerGroup as="ul" className="space-y-8">
-          {comments.map((comment) => (
-            <StaggerItem as="li" key={comment.id}>
-              <CommentItem
-                comment={comment}
-                replies={comment.replies}
-                articleId={articleId}
-                currentUser={currentUser}
-              />
-            </StaggerItem>
-          ))}
-        </StaggerGroup>
+        // key resets loaded pages whenever a comment is added or removed
+        <CommentList
+          key={`${total}:${page.items[0].id}`}
+          articleId={articleId}
+          initialComments={page.items}
+          initialCursor={page.nextCursor}
+          currentUser={currentUser}
+        />
       )}
     </section>
   );

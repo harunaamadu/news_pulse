@@ -39,6 +39,7 @@ model User {
   comments  Comment[]
   bookmarks Bookmark[]
   follows   CategoryFollow[]
+  notifications Notification[]
 
   @@map("users")
 }
@@ -99,6 +100,11 @@ model Category {
   @@map("categories")
 }
 
+enum ArticleStatus {
+  DRAFT
+  PUBLISHED
+}
+
 model Article {
   id               String    @id @default(cuid())
   slug             String    @unique
@@ -120,8 +126,11 @@ model Article {
   comments  Comment[]
   bookmarks Bookmark[]
 
+  status    ArticleStatus @default(PUBLISHED)
+
   @@index([categoryId, publishedAt])
   @@index([featured, publishedAt])
+  @@index([status, publishedAt])
   @@index([publishedAt])
   @@map("articles")
 }
@@ -170,4 +179,29 @@ model CategoryFollow {
 
   @@id([userId, categoryId])
   @@map("category_follows")
+}
+
+enum NotificationType {
+  NEW_ARTICLE
+  COMMENT_REPLY
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  title     String
+  body      String?
+  href      String
+  // Makes fan-out idempotent, e.g. "article:<id>"
+  dedupeKey String?
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, dedupeKey])
+  @@index([userId, readAt])
+  @@index([userId, createdAt])
+  @@map("notifications")
 }

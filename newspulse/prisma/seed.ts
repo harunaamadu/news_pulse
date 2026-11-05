@@ -1,4 +1,5 @@
 import { PrismaClient } from "../src/generated/prisma/client";
+import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
@@ -87,11 +88,15 @@ interdum.
 async function main() {
   const author = await prisma.user.upsert({
     where: { email: "editor@newspulse.dev" },
-    update: { content: placeholderBody(article.title) },
+    update: {},
     create: {
       email: "editor@newspulse.dev",
       name: "NewsPulse Editorial",
       role: "EDITOR",
+      passwordHash: await bcrypt.hash(
+        process.env.SEED_EDITOR_PASSWORD ?? "news@editor_1",
+        12,
+      ),
     },
   });
 

@@ -34,7 +34,7 @@ export function FormField({
           id={fieldId}
           aria-invalid={Boolean(error)}
           aria-describedby={error ? `${fieldId}-error` : undefined}
-          className={cn("pl-9", className)}
+          className={cn("pl-9 h-9", className)}
           {...props}
         />
       </div>

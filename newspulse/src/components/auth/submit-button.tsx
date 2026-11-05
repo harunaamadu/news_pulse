@@ -6,13 +6,17 @@ import { useFormStatus } from "react-dom";
 
 import { Button } from "@/components/ui/button";
 
-type SubmitButtonProps = Omit<ComponentProps<typeof Button>, "type" | "disabled">;
+type SubmitButtonProps = Omit<ComponentProps<typeof Button>, "type">;
 
-export function SubmitButton({ children, ...props }: SubmitButtonProps) {
+export function SubmitButton({
+  children,
+  disabled,
+  ...props
+}: SubmitButtonProps) {
   const { pending } = useFormStatus();
 
   return (
-    <Button type="submit" disabled={pending} {...props}>
+    <Button type="submit" size="lg" disabled={pending || disabled} {...props}>
       {pending && <Loader2 className="animate-spin" aria-hidden="true" />}
       {children}
     </Button>

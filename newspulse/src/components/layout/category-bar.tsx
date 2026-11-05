@@ -15,17 +15,37 @@ const items = [
   })),
 ];
 
+const navClassName =
+  "no-scrollbar -mx-1 flex items-center gap-1 overflow-x-auto py-2";
+const linkClassName =
+  "relative shrink-0 rounded-sm px-3.5 py-1.5 text-sm font-medium transition-colors";
+
+export function CategoryBarFallback() {
+  return (
+    <nav aria-label="Categories" className={navClassName}>
+      {items.map((item) => (
+        <Link
+          key={item.href}
+          href={item.href}
+          className={cn(
+            linkClassName,
+            "text-muted-foreground hover:text-foreground",
+          )}
+        >
+          <span className="relative z-10">{item.label}</span>
+        </Link>
+      ))}
+    </nav>
+  );
+}
+
 export function CategoryBar() {
   const pathname = usePathname();
 
   return (
-    <nav
-      aria-label="Categories"
-      className="no-scrollbar -mx-1 flex items-center gap-1 overflow-x-auto py-2"
-    >
+    <nav aria-label="Categories" className={navClassName}>
       {items.map((item) => {
-        const active =
-          item.href === "/" ? pathname === "/" : pathname === item.href;
+        const active = pathname === item.href;
 
         return (
           <Link
@@ -33,7 +53,7 @@ export function CategoryBar() {
             href={item.href}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "relative shrink-0 rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors",
+              linkClassName,
               active
                 ? "text-background"
                 : "text-muted-foreground hover:text-foreground",
@@ -42,7 +62,7 @@ export function CategoryBar() {
             {active && (
               <motion.span
                 layoutId="category-pill"
-                className="absolute inset-0 rounded-full bg-foreground"
+                className="absolute inset-0 rounded-sm bg-primary"
                 transition={{ type: "spring", stiffness: 400, damping: 34 }}
               />
             )}

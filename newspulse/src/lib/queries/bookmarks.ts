@@ -15,7 +15,7 @@ export async function isArticleBookmarked(
 
 export async function getUserBookmarks(userId: string) {
   const bookmarks = await prisma.bookmark.findMany({
-    where: { userId },
+    where: { userId, article: { status: "PUBLISHED" } },
     orderBy: { createdAt: "desc" },
     include: { article: articleWithRelations },
   });

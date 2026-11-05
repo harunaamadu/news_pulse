@@ -7,7 +7,7 @@ import authConfig from "@/auth.config";
 const { auth } = NextAuth(authConfig);
 
 const authRoutes = ["/sign-in", "/sign-up"];
-const protectedRoutes = ["/bookmarks"];
+const protectedRoutes = ["/bookmarks", "/studio", "/admin"];
 
 export default auth((req) => {
   const { nextUrl } = req;

@@ -3,8 +3,10 @@ import {
   Cinzel,
   Playfair_Display,
   Source_Serif_4,
-  Plus_Jakarta_Sans,
-  JetBrains_Mono, Inter } from "next/font/google";
+  // Plus_Jakarta_Sans,
+  JetBrains_Mono,
+  Inter,
+} from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 
@@ -12,6 +14,9 @@ import { MotionProvider } from "@/components/providers/motion-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { siteConfig } from "@/config/site";
+
+import { OfflineIndicator } from "@/components/pwa/offline-indicator";
+import { ServiceWorkerRegister } from "@/components/pwa/service-worker-register";
 
 const fontDisplay = Cinzel({
   subsets: ["latin"],
@@ -28,7 +33,7 @@ const fontProse = Source_Serif_4({
   variable: "--font-prose",
 });
 
-const inter = Inter({subsets:['latin'],variable:'--font-sans'});
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 const fontMono = JetBrains_Mono({
   subsets: ["latin"],
@@ -42,6 +47,14 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
+
+  applicationName: siteConfig.name,
+  appleWebApp: {
+    capable: true,
+    title: siteConfig.name,
+    statusBarStyle: "default",
+  },
+
   openGraph: {
     type: "website",
     siteName: siteConfig.name,
@@ -59,7 +72,11 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" suppressHydrationWarning className={cn("font-sans", inter.variable)}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={cn("font-sans", inter.variable)}
+    >
       <body
         className={cn(
           "h-full min-h-full flex flex-col font-sans",
@@ -78,6 +95,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           disableTransitionOnChange
         >
           <MotionProvider>{children}</MotionProvider>
+          <OfflineIndicator />
+          <ServiceWorkerRegister />
           <Toaster richColors position="bottom-right" />
         </ThemeProvider>
       </body>

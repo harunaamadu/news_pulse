@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
 import { AuthCard } from "@/components/auth/auth-card";
+import { AuthSkeleton } from "@/components/auth/auth-skeleton";
 import { OAuthButtons } from "@/components/auth/oauth-buttons";
 import { SignUpForm } from "@/components/auth/sign-up-form";
 
@@ -10,7 +12,15 @@ interface SignUpPageProps {
   searchParams: Promise<{ callbackUrl?: string }>;
 }
 
-export default async function SignUpPage({ searchParams }: SignUpPageProps) {
+export default function SignUpPage({ searchParams }: SignUpPageProps) {
+  return (
+    <Suspense fallback={<AuthSkeleton />}>
+      <SignUpContent searchParams={searchParams} />
+    </Suspense>
+  );
+}
+
+async function SignUpContent({ searchParams }: SignUpPageProps) {
   const { callbackUrl } = await searchParams;
   const signInHref = callbackUrl
     ? `/sign-in?callbackUrl=${encodeURIComponent(callbackUrl)}`

@@ -8,6 +8,12 @@ import { prisma } from "@/lib/prisma";
 import { signInSchema, signUpSchema } from "@/lib/validations";
 import type { ActionState } from "@/types";
 
+import {
+  checkRateLimit,
+  getClientIp,
+  rateLimitMessage,
+} from "@/lib/rate-limit";
+
 function readString(formData: FormData, key: string): string {
   const value = formData.get(key);
   return typeof value === "string" ? value : "";
@@ -48,6 +54,15 @@ export async function signInAction(
     throw error; // lets Next.js handle the success redirect
   }
 
+  const ip = await getClientIp();
+  const limit = await checkRateLimit("sign-in", `${ip}:${parsed.data.email}`);
+  if (!limit.ok) {
+    return {
+      error: rateLimitMessage(limit.retryAfter),
+      values: { email: parsed.data.email },
+    };
+  }
+
   return {};
 }
 
@@ -72,6 +87,11 @@ export async function signUpAction(
   const { name, email, password } = parsed.data;
   const values = { name, email };
 
+  const limit = await checkRateLimit("sign-up", await getClientIp());
+  if (!limit.ok) {
+    return { error: rateLimitMessage(limit.retryAfter), values };
+  }
+  
   const existing = await prisma.user.findUnique({
     where: { email },
     select: { id: true },
